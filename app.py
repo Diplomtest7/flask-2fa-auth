@@ -13,7 +13,7 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'diplllom7@gmail.com'
-app.config['MAIL_PASSWORD'] = 'bclowbvrifgftbpa'  # використовується Gmail App Password
+app.config['MAIL_PASSWORD'] = 'bclowbvrifgftbpa'  # Gmail App Password
 mail = Mail(app)
 
 # Ініціалізація БД
@@ -29,7 +29,7 @@ def init_db():
 
 @app.route('/')
 def index():
-    return redirect('/login')
+    return redirect('/register')  # ОНОВЛЕНО
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
