@@ -7,9 +7,9 @@ import sqlite3
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
-app.config['DEBUG'] = True  # Включено режим налагодження
+app.config['DEBUG'] = True  # Режим налагодження
 
-# Flask-Mail налаштування
+# Налаштування пошти (через Gmail)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -41,7 +41,7 @@ def register():
 
         try:
             with sqlite3.connect('database.db') as conn:
-                conn.execute("INSERT INTO users (email, password, otp_secret) VALUES (?, ?, ?)", 
+                conn.execute("INSERT INTO users (email, password, otp_secret) VALUES (?, ?, ?)",
                              (email, password, otp_secret))
             otp_uri = pyotp.totp.TOTP(otp_secret).provisioning_uri(name=email, issuer_name="2FA System")
             return render_template('qr.html', otp_uri=otp_uri)
@@ -109,12 +109,14 @@ def reset_request():
         session['reset_email'] = email
         session['reset_token'] = token
 
-        # ТЕСТ: не надсилаємо email, просто друкуємо в лог
-        print("=== ПОСИЛАННЯ ДЛЯ СКИДАННЯ ПАРОЛЯ ===")
-        print(reset_link)
-        print("=== /ПОСИЛАННЯ ===")
+        # Реальна відправка листа
+        msg = Message('Скидання пароля - 2FA Система',
+                      sender='diplllom7@gmail.com',
+                      recipients=[email])
+        msg.body = f"Натисніть на посилання для скидання пароля: {reset_link}"
+        mail.send(msg)
 
-        flash("Лист для скидання пароля надіслано (імітація)")
+        flash("Лист для скидання пароля надіслано")
         return redirect('/login')
     return render_template('reset_request.html')
 
