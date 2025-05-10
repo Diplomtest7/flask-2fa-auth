@@ -3,83 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Двофакторна перевірка</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f5f7;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 50px;
-        }
-
-        .form-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        .flash {
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #ffe5e5;
-            border: 1px solid #ff8a8a;
-            border-radius: 4px;
-            color: #b30000;
-        }
-
-        a {
-            display: block;
-            margin-top: 15px;
-            text-align: center;
-            color: #007bff;
-        }
-
-    </style>
 </head>
 <body>
-    <div class="form-container">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="flash">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <h2>Двофакторна перевірка</h2>
-        <p>Введіть 6-значний код з Google Authenticator</p>
-        <form method="POST">
-            <label for="otp">Код:</label>
-            <input type="text" name="otp" id="otp" required placeholder="123456">
-            <button type="submit" class="btn">Підтвердити</button>
-        </form>
-
-        <a href="{{ url_for('logout') }}">Вийти</a>
-    </div>
+    <h2>Двофакторна перевірка</h2>
+    <img src="data:image/png;base64,{{ qr_code_img }}" alt="QR Code"><br>
+    <form method="POST">
+        <input type="text" name="otp" placeholder="Введіть код"><br>
+        <button type="submit">Підтвердити</button>
+    </form>
 </body>
 </html>

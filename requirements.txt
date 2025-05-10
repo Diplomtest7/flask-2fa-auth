@@ -1,9 +1,6 @@
 Flask
-Flask-Login
-Flask-WTF
-Flask-Mail
 Flask-SQLAlchemy
+Flask-Mail
 pyotp
 qrcode
-gunicorn
-Pillow
+pillow
