@@ -7,13 +7,14 @@ import sqlite3
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
+app.config['DEBUG'] = True  # Включено режим налагодження
 
 # Flask-Mail налаштування
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'diplllom7@gmail.com'
-app.config['MAIL_PASSWORD'] = 'bclowbvrifgftbpa'  # Gmail App Password
+app.config['MAIL_PASSWORD'] = 'bclowbvrifgftbpa'
 mail = Mail(app)
 
 # Ініціалізація БД
@@ -29,7 +30,7 @@ def init_db():
 
 @app.route('/')
 def index():
-    return redirect('/register')  # ОНОВЛЕНО
+    return redirect('/register')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -108,9 +109,12 @@ def reset_request():
         session['reset_email'] = email
         session['reset_token'] = token
 
-        msg = Message("Скидання пароля", recipients=[email], body=f"Ось посилання для скидання пароля: {reset_link}")
-        mail.send(msg)
-        flash("Лист для скидання пароля надіслано")
+        # ТЕСТ: не надсилаємо email, просто друкуємо в лог
+        print("=== ПОСИЛАННЯ ДЛЯ СКИДАННЯ ПАРОЛЯ ===")
+        print(reset_link)
+        print("=== /ПОСИЛАННЯ ===")
+
+        flash("Лист для скидання пароля надіслано (імітація)")
         return redirect('/login')
     return render_template('reset_request.html')
 
