@@ -2,36 +2,84 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>2FA Перевірка</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Двофакторна перевірка</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f5f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .flash {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #ffe5e5;
+            border: 1px solid #ff8a8a;
+            border-radius: 4px;
+            color: #b30000;
+        }
+
+        a {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: #007bff;
+        }
+
+    </style>
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} text-center">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    <div class="card p-4 shadow-sm">
-        <h2 class="text-center text-primary">Двофакторна перевірка</h2>
-        <p class="text-center">Введіть 6-значний код з Google Authenticator</p>
+<body>
+    <div class="form-container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>Двофакторна перевірка</h2>
+        <p>Введіть 6-значний код з Google Authenticator</p>
         <form method="POST">
-            <div class="mb-3">
-                <label for="otp" class="form-label">Код:</label>
-                <input type="text" class="form-control" id="otp" name="otp" placeholder="123 456" required>
-            </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Підтвердити</button>
-            </div>
+            <label for="otp">Код:</label>
+            <input type="text" name="otp" id="otp" required placeholder="123456">
+            <button type="submit" class="btn">Підтвердити</button>
         </form>
-        <div class="mt-3 text-center">
-            <a href="{{ url_for('login') }}">Вийти</a>
-        </div>
+
+        <a href="{{ url_for('logout') }}">Вийти</a>
     </div>
-</div>
 </body>
 </html>
