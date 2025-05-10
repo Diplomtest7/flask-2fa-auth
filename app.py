@@ -1,50 +1,41 @@
-
-from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_mail import Mail, Message
+from flask import Flask, render_template, redirect, url_for, request, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import pyotp
+import qrcode
+import io
+import base64
 import os
-import sqlite3
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
-app.config['DEBUG'] = True
+app.secret_key = os.urandom(24)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'diplllom7@gmail.com'
-app.config['MAIL_PASSWORD'] = 'bclowbvrifgftbpa'
-mail = Mail(app)
-
-def init_db():
-    with sqlite3.connect('database.db') as conn:
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS users ("
-            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-            "email TEXT UNIQUE NOT NULL, "
-            "password TEXT NOT NULL, "
-            "otp_secret TEXT NOT NULL)"
-        )
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    otp_secret = db.Column(db.String(16))
 
 @app.route('/')
-def index():
-    return redirect('/register')
+def home():
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        hashed_pw = generate_password_hash(password)
         otp_secret = pyotp.random_base32()
-        try:
-            with sqlite3.connect('database.db') as conn:
-                conn.execute("INSERT INTO users (email, password, otp_secret) VALUES (?, ?, ?)",
-                             (email, password, otp_secret))
-            otp_uri = pyotp.totp.TOTP(otp_secret).provisioning_uri(name=email, issuer_name="2FA System")
-            return render_template('qr.html', otp_uri=otp_uri)
-        except sqlite3.IntegrityError:
-            flash("Користувач з таким email вже існує")
-            return redirect('/register')
+        new_user = User(email=email, password=hashed_pw, otp_secret=otp_secret)
+        db.session.add(new_user)
+        db.session.commit()
+
+        session['user_id'] = new_user.id
+        return redirect(url_for('show_qr'))
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -52,78 +43,54 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        with sqlite3.connect('database.db') as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
-            user = cur.fetchone()
-        if user:
-            session['email'] = email
-            session['otp_secret'] = user[3]
-            return redirect('/2fa')
-        else:
-            flash('Невірний email або пароль. <a href="/reset_request">Скинути пароль</a>')
-            return redirect('/login')
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            return redirect(url_for('two_factor'))
+        flash('Невірний email або пароль.', 'danger')
     return render_template('login.html')
+
+@app.route('/show_qr')
+def show_qr():
+    user = db.session.get(User, session['user_id'])
+    otp_uri = pyotp.totp.TOTP(user.otp_secret).provisioning_uri(name=user.email, issuer_name='2FA App')
+    img = qrcode.make(otp_uri)
+    buf = io.BytesIO()
+    img.save(buf)
+    img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    return render_template('show_qr.html', img_data=img_base64)
 
 @app.route('/2fa', methods=['GET', 'POST'])
 def two_factor():
-    if 'otp_secret' not in session:
-        return redirect('/login')
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
-        otp_input = request.form.get('otp')
+        otp_input = request.form.get('otp', '').replace(' ', '')
         if not otp_input:
-            flash("Код не введено")
-            return redirect('/2fa')
-        totp = pyotp.TOTP(session['otp_secret'])
-        if totp.verify(otp_input):
-            return redirect('/dashboard')
+            flash('Код не введено', 'warning')
+            return redirect(url_for('two_factor'))
+
+        user = db.session.get(User, session['user_id'])
+        if user and user.otp_secret:
+            totp = pyotp.TOTP(user.otp_secret)
+            if totp.verify(otp_input):
+                session['authenticated'] = True
+                flash('Вхід успішний', 'success')
+                return redirect(url_for('success'))
+            else:
+                flash('Неправильний код', 'danger')
         else:
-            flash("Невірний код")
-            return redirect('/2fa')
+            flash('Двофакторна аутентифікація не налаштована', 'danger')
+
     return render_template('two_factor.html')
 
-@app.route('/dashboard')
-def dashboard():
-    if 'email' in session:
-        return render_template('dashboard.html')
-    return redirect('/login')
+@app.route('/success')
+def success():
+    if session.get('authenticated'):
+        return "Ви успішно увійшли!"
+    return redirect(url_for('login'))
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/login')
-
-@app.route('/reset_request', methods=['GET', 'POST'])
-def reset_request():
-    if request.method == 'POST':
-        email = request.form['email']
-        token = os.urandom(16).hex()
-        reset_link = f"https://{request.host}/reset_password/{token}"
-        session['reset_email'] = email
-        session['reset_token'] = token
-        msg = Message('Скидання пароля - 2FA Система',
-                      sender='diplllom7@gmail.com',
-                      recipients=[email])
-        msg.body = f"Натисніть на посилання для скидання пароля: {reset_link}"
-        mail.send(msg)
-        flash("Лист для скидання пароля надіслано")
-        return redirect('/login')
-    return render_template('reset_request.html')
-
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if token != session.get('reset_token'):
-        return "Невалідний токен", 400
-    if request.method == 'POST':
-        new_password = request.form['password']
-        email = session.get('reset_email')
-        with sqlite3.connect('database.db') as conn:
-            conn.execute("UPDATE users SET password=? WHERE email=?", (new_password, email))
-        flash("Пароль оновлено")
-        return redirect('/login')
-    return render_template('reset_password.html')
-
-if __name__ == "__main__":
-    init_db()
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    db.create_all()
+    app.run(debug=True)
