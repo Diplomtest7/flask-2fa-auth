@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Скануйте QR-код</h2>
+<p>Додайте обліковий запис у Google Authenticator</p>
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ otp_uri }}">
+<br><br>
+<a class="btn btn-success w-100" href="/login">Увійти</a>
+{% endblock %}

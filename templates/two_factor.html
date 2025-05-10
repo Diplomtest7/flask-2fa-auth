@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Двофакторна перевірка</h2>
+<p>Введіть 6-значний код з Google Authenticator</p>
+<form method="POST">
+    <label for="code">Код:</label>
+    <input class="form-control mb-2" id="code" name="code" placeholder="123 456" required>
+    <button class="btn btn-primary w-100" type="submit">Підтвердити</button>
+</form>
+<a href="/logout" class="btn btn-link">Вийти</a>
+{% endblock %}

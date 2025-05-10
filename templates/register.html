@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Реєстрація</h2>
+<form method="POST">
+    <input class="form-control mb-2" name="email" type="email" placeholder="Email" required>
+    <input class="form-control mb-2" name="password" type="password" placeholder="Пароль" required>
+    <button class="btn btn-success w-100" type="submit">Зареєструватися</button>
+</form>
+<a href="/login">Уже маєте акаунт?</a>
+{% endblock %}
