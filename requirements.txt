@@ -1,6 +1,9 @@
-Flask==2.3.3
-Flask-Mail==0.9.1
-Flask-SQLAlchemy==3.1.1
-pyotp==2.8.0
-qrcode==7.4.2
-gunicorn==21.2.0
+Flask
+Flask-SQLAlchemy
+Flask-WTF
+WTForms
+email-validator
+pyotp
+qrcode
+Pillow
+gunicorn
