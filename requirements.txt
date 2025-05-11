@@ -1,6 +1,11 @@
 Flask
 Flask-SQLAlchemy
+Flask-WTF
 Flask-Mail
+email-validator
 pyotp
 qrcode
-pillow
+Pillow
+gunicorn
+
+
