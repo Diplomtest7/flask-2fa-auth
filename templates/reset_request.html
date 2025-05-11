@@ -1,1 +1,10 @@
-<!-- reset_request.html шаблон -->
+{% extends "base.html" %}
+{% block title %}Reset Password{% endblock %}
+{% block content %}
+<h2>Request Password Reset</h2>
+<form method="POST">
+    <label>Email:</label><br>
+    <input type="email" name="email" required><br><br>
+    <button type="submit">Send Reset Email</button>
+</form>
+{% endblock %}
