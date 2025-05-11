@@ -1,6 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Панель користувача{% endblock %}
 {% block content %}
-<h2>Dashboard</h2>
-<p>Welcome, {{ email }}!</p>
+<h2>Вітаємо, {{ email }}!</h2>
+<p>Ви успішно увійшли в систему з двофакторною аутентифікацією.</p>
+<div class="link">
+    <a href="{{ url_for('logout') }}">Вийти</a>
+</div>
 {% endblock %}

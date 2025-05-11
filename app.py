@@ -50,7 +50,7 @@ def register():
         password = generate_password_hash(request.form['password'])
         otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
         if User.query.filter_by(email=email).first():
-            flash('Email already registered.')
+            flash('Email already зареєстрований.')
             return redirect(url_for('register'))
         user = User(email=email, password=password, otp_secret=otp_secret)
         db.session.add(user)
@@ -59,7 +59,11 @@ def register():
         return redirect(url_for('two_factor'))
     return render_template('register.html')
 
-@app.route('/two_factor')
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    return render_template('login.html')
+
+@app.route('/two_factor', methods=['GET', 'POST'])
 def two_factor():
     email = session.get('email')
     if not email:
@@ -67,8 +71,41 @@ def two_factor():
     user = User.query.filter_by(email=email).first()
     otp_uri = f'otpauth://totp/Flask2FA:{email}?secret={user.otp_secret}&issuer=Flask2FA'
     qr_code = generate_qr_code(otp_uri)
-    send_verification_email(email, user.otp_secret[:6])  # imitation
+    send_verification_email(email, user.otp_secret[:6])
     return render_template('two_factor.html', qr_code=qr_code)
 
+@app.route('/qr')
+def qr_page():
+    email = session.get('email')
+    if not email:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(email=email).first()
+    otp_uri = f'otpauth://totp/Flask2FA:{email}?secret={user.otp_secret}&issuer=Flask2FA'
+    qr_code = generate_qr_code(otp_uri)
+    return render_template('qr.html', qr_code=qr_code)
+
+@app.route('/dashboard')
+def dashboard():
+    email = session.get('email')
+    if not email:
+        flash('Будь ласка, увійдіть спочатку.')
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', email=email)
+
+@app.route('/reset_request', methods=['GET', 'POST'])
+def reset_request():
+    return render_template('reset_request.html')
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    return render_template('reset_password.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Ви вийшли з акаунту.')
+    return redirect(url_for('login'))
+
 if __name__ == '__main__':
-    app.run()
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)

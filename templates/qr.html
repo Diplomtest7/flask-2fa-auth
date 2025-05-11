@@ -1,1 +1,12 @@
-<!-- qr.html шаблон -->
+{% extends "base.html" %}
+{% block title %}QR-код для 2FA{% endblock %}
+{% block content %}
+<h2>QR-код для аутентифікації</h2>
+<p>Скануйте цей код у своєму додатку Google Authenticator:</p>
+<div style="text-align:center;">
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" width="200">
+</div>
+<div class="link">
+    <a href="{{ url_for('two_factor') }}">Ввести код</a>
+</div>
+{% endblock %}

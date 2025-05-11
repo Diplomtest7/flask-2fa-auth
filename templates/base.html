@@ -2,55 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask 2FA{% endblock %}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f4f8;
+            background-color: #f2f2f2;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
-        .form-container {
-            background-color: white;
-            padding: 2em;
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
         }
-        input[type="email"], input[type="password"], input[type="text"] {
+        h2 {
+            text-align: center;
+            color: #333333;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            color: #555;
+        }
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
             width: 100%;
             padding: 10px;
-            margin-top: 0.5em;
-            margin-bottom: 1em;
-            border-radius: 5px;
+            margin-top: 5px;
             border: 1px solid #ccc;
+            border-radius: 5px;
         }
         button {
+            margin-top: 20px;
             width: 100%;
+            padding: 10px;
             background-color: #007BFF;
             color: white;
-            padding: 10px;
             border: none;
             border-radius: 5px;
+            cursor: pointer;
         }
-        a {
+        button:hover {
+            background-color: #0056b3;
+        }
+        .link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .link a {
             color: #007BFF;
             text-decoration: none;
-            font-size: 0.9em;
         }
-        .message {
-            color: red;
-            font-size: 0.9em;
+        .link a:hover {
+            text-decoration: underline;
+        }
+        .flash {
+            background-color: #ffdddd;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid red;
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
+    <div class="container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div class="message">{{ messages[0] }}</div>
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}

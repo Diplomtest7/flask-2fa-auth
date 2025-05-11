@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-<h2>Login</h2>
+<h2>Вхід</h2>
 <form method="POST">
-    <label>Email:</label>
+    <label for="email">Email:</label>
     <input type="email" name="email" required>
-    <label>Password:</label>
+
+    <label for="password">Пароль:</label>
     <input type="password" name="password" required>
-    <button type="submit">Login</button>
+
+    <button type="submit">Увійти</button>
 </form>
-<p><a href="{{ url_for('reset_request') }}">Forgot password?</a></p>
-<p>Need an account? <a href="{{ url_for('register') }}">Register</a></p>
+<div class="link">
+    <p><a href="{{ url_for('reset_request') }}">Забули пароль?</a></p>
+    <p>Ще не зареєстровані? <a href="{{ url_for('register') }}">Зареєструватися</a></p>
+</div>
 {% endblock %}

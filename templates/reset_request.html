@@ -1,10 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Reset Password{% endblock %}
+{% block title %}Скидання пароля{% endblock %}
 {% block content %}
-<h2>Reset Password</h2>
+<h2>Скинути пароль</h2>
 <form method="POST">
-    <label>Email:</label>
+    <label for="email">Ваша електронна пошта:</label>
     <input type="email" name="email" required>
-    <button type="submit">Request Password Reset</button>
+    <button type="submit">Надіслати лист</button>
 </form>
+<div class="link">
+    <a href="{{ url_for('login') }}">Повернутися до входу</a>
+</div>
 {% endblock %}
