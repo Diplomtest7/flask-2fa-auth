@@ -7,5 +7,6 @@ pyotp
 qrcode
 Pillow
 gunicorn
+python-dotenv
 
 
