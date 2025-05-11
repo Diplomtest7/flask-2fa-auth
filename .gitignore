@@ -1,0 +1,17 @@
+# Секретні дані
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+instance/
+
+# IDE / редактори
+.vscode/
+.idea/
+
+# Системні
+.DS_Store
