@@ -71,4 +71,6 @@ def two_factor():
     return render_template('two_factor.html', qr_code=qr_code)
 
 if __name__ == '__main__':
-    app.run()
+    import os
+    port = int(os.environ.get('PORT', 10000))  # Render надає PORT в змінних оточення
+    app.run(host='0.0.0.0', port=port)
