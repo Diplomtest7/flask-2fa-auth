@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Two-Factor Authentication{% endblock %}
+{% block title %}Two-Factor Verification{% endblock %}
 {% block content %}
-<h2>Scan this QR code with your authenticator app</h2>
-<img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
-<p>Enter the code from your app:</p>
+<h2>Two-Factor Verification</h2>
+<img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" style="margin-bottom: 10px;">
 <form method="POST">
+    <label>Enter Code:</label>
     <input type="text" name="otp" required>
     <button type="submit">Verify</button>
 </form>
