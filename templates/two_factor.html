@@ -1,14 +1,13 @@
-{% extends "base.html" %}
-{% block title %}Двофакторна аутентифікація{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Двофакторна перевірка{% endblock %}
 {% block content %}
-<h2>Двофакторна перевірка</h2>
-<p>Скануйте цей QR-код у додатку Google Authenticator:</p>
-<div style="text-align:center; margin: 20px 0;">
-    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" width="200">
+<div class="form-container">
+    <h2>Двофакторна перевірка</h2>
+    <p>Скануйте цей QR-код у додатку Google Authenticator:</p>
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+    <form method="POST">
+        <input type="text" name="otp" placeholder="6-значний код" required>
+        <button type="submit">Підтвердити</button>
+    </form>
 </div>
-<p>Після цього введіть код із додатку:</p>
-<form method="POST">
-    <input type="text" name="otp" placeholder="6-значний код" required>
-    <button type="submit">Підтвердити</button>
-</form>
 {% endblock %}
