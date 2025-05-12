@@ -80,6 +80,17 @@ def two_factor():
         flash('Невірний код. Спробуйте ще.')
     return render_template('two_factor.html', qr_code=qr_code)
 
+@app.route('/reset_request', methods=['GET', 'POST'])
+def reset_request():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash('Лист зі скиданням пароля надіслано на пошту.')
+        else:
+            flash('Користувача з таким емейлом не знайдено.')
+    return render_template('reset_request.html')
+
 @app.route('/dashboard')
 def dashboard():
     if not session.get('authenticated'):

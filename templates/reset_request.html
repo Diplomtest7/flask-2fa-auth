@@ -1,12 +1,33 @@
-{% extends 'base.html' %}
-{% block title %}Скидання паролю{% endblock %}
+{% extends "base.html" %}
+{% block title %}Скидання пароля{% endblock %}
+
 {% block content %}
-<div class="form-container">
-  <h2>Скидання паролю</h2>
-  <form method="POST">
-    <label>Емейл:</label>
-    <input type="email" name="email" required>
-    <button type="submit">Надіслати код</button>
-  </form>
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="card p-4 shadow" style="width: 100%; max-width: 420px;">
+    <h4 class="text-center mb-3">Скидання пароля</h4>
+    <p class="text-muted text-center mb-4">
+      Введіть свою електронну пошту, і ми надішлемо вам інструкції для скидання пароля.
+    </p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-info text-center" role="alert">
+          {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="mb-3">
+        <label for="email" class="form-label">Електронна пошта</label>
+        <input type="email" class="form-control" name="email" id="email" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Скинути пароль</button>
+    </form>
+
+    <div class="text-center mt-3">
+      <a href="{{ url_for('login') }}">Повернутися до входу</a>
+    </div>
+  </div>
 </div>
 {% endblock %}
