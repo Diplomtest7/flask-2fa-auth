@@ -4,10 +4,13 @@ import io
 import pyotp
 import qrcode
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+import random
+from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+mail = Mail(app)
 app.config['SECRET_KEY'] = 'supersecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(app)
@@ -78,13 +81,35 @@ def two_factor():
 
 @app.route('/reset_request', methods=['GET', 'POST'])
 def reset_request():
-    if request.method == 'POST':
-        email = request.form['email']
-        user = User.query.filter_by(email=email).first()
-        if user:
-            flash('Лист зі скиданням пароля надіслано на пошту.')
-        else:
-            flash('Користувача з таким емейлом не знайдено.')
+    if request.method == "POST":
+        if 'email' in request.form:
+            email = request.form['email']
+            user = User.query.filter_by(email=email).first()
+            if user:
+                reset_code = str(random.randint(100000, 999999))
+                session['reset_email'] = email
+                session['reset_code'] = reset_code
+
+                msg = Message('Код для скидання пароля',
+                              sender='your_email@example.com',
+                              recipients=[email])
+                msg.body = f'Ваш код для скидання пароля: {reset_code}'
+                mail.send(msg)
+
+                flash('Код надіслано на пошту.')
+                return render_template('reset_request.html', show_code_field=True)
+
+            else:
+                flash('Користувача з такою поштою не знайдено.')
+        elif 'reset_code' in request.form:
+            entered_code = request.form['reset_code']
+            if entered_code == session.get('reset_code'):
+                flash('Код підтверджено! Тепер ви можете задати новий пароль.')
+                return redirect(url_for('reset_password'))
+            else:
+                flash('Невірний код. Спробуйте ще раз.')
+                return render_template('reset_request.html', show_code_field=True)
+
     return render_template('reset_request.html')
 
 @app.route('/dashboard')

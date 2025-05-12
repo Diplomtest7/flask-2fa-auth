@@ -5,9 +5,6 @@
 <div class="d-flex justify-content-center align-items-center vh-100">
   <div class="card p-4 shadow" style="width: 100%; max-width: 420px;">
     <h4 class="text-center mb-3">Скидання пароля</h4>
-    <p class="text-muted text-center mb-4">
-      Введіть свою електронну пошту, і ми надішлемо вам інструкції для скидання пароля.
-    </p>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -18,11 +15,19 @@
     {% endwith %}
 
     <form method="POST">
-      <div class="mb-3">
-        <label for="email" class="form-label">Електронна пошта</label>
-        <input type="email" class="form-control" name="email" id="email" required>
-      </div>
-      <button type="submit" class="btn btn-primary w-100">Скинути пароль</button>
+      {% if not show_code_field %}
+        <div class="mb-3">
+          <label for="email" class="form-label">Електронна пошта:</label>
+          <input type="email" class="form-control" name="email" id="email" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Надіслати код</button>
+      {% else %}
+        <div class="mb-3">
+          <label for="reset_code" class="form-label">Введіть код із пошти:</label>
+          <input type="text" class="form-control" name="reset_code" id="reset_code" required>
+        </div>
+        <button type="submit" class="btn btn-success w-100">Підтвердити</button>
+      {% endif %}
     </form>
 
     <div class="text-center mt-3">
