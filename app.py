@@ -118,6 +118,24 @@ def reset_request():
 
     return render_template('reset_request.html')
 
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        password = request.form['password']
+        email = session.get('reset_email')
+
+        if email:
+            user = User.query.filter_by(email=email).first()
+            if user:
+                user.password = generate_password_hash(password)
+                db.session.commit()
+                flash('Пароль оновлено успішно.')
+                return redirect(url_for('login'))
+        flash('Помилка при оновленні пароля.')
+        return redirect(url_for('reset_request'))
+
+    return render_template('reset_password.html')
+
 @app.route('/dashboard')
 def dashboard():
     if not session.get('authenticated'):
