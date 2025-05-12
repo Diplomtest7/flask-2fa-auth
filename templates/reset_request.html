@@ -1,13 +1,12 @@
-{% extends "base.html" %}
-{% block title %}Скидання пароля{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Скидання паролю{% endblock %}
 {% block content %}
-<h2>Скинути пароль</h2>
-<form method="POST">
-    <label for="email">Ваша електронна пошта:</label>
+<div class="form-container">
+  <h2>Скидання паролю</h2>
+  <form method="POST">
+    <label>Емейл:</label>
     <input type="email" name="email" required>
-    <button type="submit">Надіслати лист</button>
-</form>
-<div class="link">
-    <a href="{{ url_for('login') }}">Повернутися до входу</a>
+    <button type="submit">Надіслати код</button>
+  </form>
 </div>
 {% endblock %}
