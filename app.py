@@ -59,10 +59,6 @@ def login():
         flash('Невірні дані для входу.')
     return render_template('login.html')
 
-@app.route('/reset_request', methods=['GET', 'POST'])
-def reset_request():
-    return render_template('reset_request.html')
-
 @app.route('/two_factor', methods=['GET', 'POST'])
 def two_factor():
     email = session.get('email')
