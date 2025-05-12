@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Панель користувача{% endblock %}
+{% block title %}Кабінет{% endblock %}
 {% block content %}
-<h2>Вітаємо, {{ email }}!</h2>
-<p>Ви успішно увійшли в систему з двофакторною аутентифікацією.</p>
-<div class="link">
-    <a href="{{ url_for('logout') }}">Вийти</a>
+<h4 class="text-center mb-4">Вітаємо у кабінеті!</h4>
+<p class="text-center">Ви успішно авторизувалися з двофакторною перевіркою.</p>
+<div class="text-center">
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Вийти</a>
 </div>
 {% endblock %}
